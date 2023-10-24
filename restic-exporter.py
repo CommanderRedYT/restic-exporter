@@ -375,6 +375,9 @@ if __name__ == "__main__":
             exporter_disable_locks,
             exporter_include_paths,
         )
+        logging.info(
+            "Collector setup complete, trying to serve at http://{0}:{1}".format(exporter_address, exporter_port)
+        )
         REGISTRY.register(collector)
         start_http_server(exporter_port, exporter_address)
         logging.info(
