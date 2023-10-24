@@ -235,6 +235,8 @@ class ResticCollector(object):
         if only_latest:
             cmd.extend(["--latest", "1"])
 
+        logging.debug("Executing command: %s", " ".join(cmd))
+
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if result.returncode != 0:
             raise Exception(
@@ -267,6 +269,8 @@ class ResticCollector(object):
         if snapshot_id is not None:
             cmd.extend([snapshot_id])
 
+        logging.debug("Executing command: %s", " ".join(cmd))
+
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if result.returncode != 0:
             raise Exception(
@@ -291,6 +295,8 @@ class ResticCollector(object):
             "check",
         ]
 
+        logging.debug("Executing command: %s", " ".join(cmd))
+
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if result.returncode == 0:
             return 1  # ok
@@ -311,6 +317,8 @@ class ResticCollector(object):
             "list",
             "locks",
         ]
+
+        logging.debug("Executing command: %s", " ".join(cmd))
 
         result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if result.returncode != 0:
