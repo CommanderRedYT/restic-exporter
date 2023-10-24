@@ -34,7 +34,7 @@ class ResticCollector(object):
         # saved in a persistent volume
         self.stats_cache = {}
         self.metrics = {}
-        self.slow_stats_counter = 0
+        self.slow_stats_counter = self.slow_stats_rate - 1
         self.refresh(exit_on_error)
 
     def collect(self):
