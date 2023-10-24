@@ -122,6 +122,8 @@ is `Flase` (only log error, such as network error with Cloud backends).
 - `NO_CHECK`: (Optional) Do not perform `restic check` operation for performance
 reasons. Default is `False` (perform `restic check`).
 - `NO_STATS`: (Optional) Do not collect per backup statistics for performance
+- `SLOW_STATS`: (Optional) Only collect stats every N requests for performance
+- `SLOW_STATS_RATE`: (Optional) Sets the N for SLOW_STATS. Default is `10`.
 reasons. Default is `False` (collect per backup statistics).
 - `NO_LOCKS`: (Optional) Do not collect the number of locks. Default is `False` (collect the number of locks).
 - `INCLUDE_PATHS`: (Optional) Include snapshot paths for each backup. The paths are separated by commas. Default is `False` (not collect the paths).

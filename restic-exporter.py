@@ -17,13 +17,15 @@ from prometheus_client.core import GaugeMetricFamily, CounterMetricFamily, REGIS
 class ResticCollector(object):
     def __init__(
         self, repository, password_file, exit_on_error, disable_check,
-            disable_stats, disable_locks, include_paths
+            disable_stats, slow_stats, slow_stats_rate, disable_locks, include_paths
     ):
         self.repository = repository
         self.password_file = password_file
         self.exit_on_error = exit_on_error
         self.disable_check = disable_check
         self.disable_stats = disable_stats
+        self.slow_stats = slow_stats
+        self.slow_stats_rate = slow_stats_rate
         self.disable_locks = disable_locks
         self.include_paths = include_paths
         # todo: the stats cache increases over time -> remove old ids
@@ -32,6 +34,7 @@ class ResticCollector(object):
         # saved in a persistent volume
         self.stats_cache = {}
         self.metrics = {}
+        self.slow_stats_counter = 0
         self.refresh(exit_on_error)
 
     def collect(self):
@@ -168,7 +171,7 @@ class ResticCollector(object):
         clients = []
         for snap in list(latest_snapshots.values()):
             # collect stats for each snap only if enabled
-            if self.disable_stats:
+            if self.disable_stats or (self.slow_stats and self.slow_stats_counter != 0):
                 # return zero as "no-stats" value
                 stats = {
                     "total_size": -1,
@@ -217,6 +220,9 @@ class ResticCollector(object):
             # 'size_total': stats['total_size'],
             # 'files_total': stats['total_file_count'],
         }
+
+        if self.slow_stats:
+            self.slow_stats_counter = (self.slow_stats_counter + 1) % self.slow_stats_rate
 
         return metrics
 
@@ -370,6 +376,8 @@ if __name__ == "__main__":
     exporter_exit_on_error = bool(os.environ.get("EXIT_ON_ERROR", False))
     exporter_disable_check = bool(os.environ.get("NO_CHECK", False))
     exporter_disable_stats = bool(os.environ.get("NO_STATS", False))
+    exporter_slow_stats = bool(os.environ.get("SLOW_STATS", False))
+    exporter_slow_stats_rate = int(os.environ.get("SLOW_STATS_RATE", 5))
     exporter_disable_locks = bool(os.environ.get("NO_LOCKS", False))
     exporter_include_paths = bool(os.environ.get("INCLUDE_PATHS", False))
 
@@ -380,6 +388,8 @@ if __name__ == "__main__":
             exporter_exit_on_error,
             exporter_disable_check,
             exporter_disable_stats,
+            exporter_slow_stats,
+            exporter_slow_stats_rate,
             exporter_disable_locks,
             exporter_include_paths,
         )
