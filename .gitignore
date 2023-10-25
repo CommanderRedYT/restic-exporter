@@ -6,3 +6,4 @@ _trial_temp/
 .vscode
 .run/
 venv
+.passwd

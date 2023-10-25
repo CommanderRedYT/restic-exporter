@@ -35,6 +35,7 @@ class ResticCollector(object):
         self.stats_cache = {}
         self.metrics = {}
         self.slow_stats_counter = self.slow_stats_rate - 1
+        self.slow_stats_cache = None
         self.refresh(exit_on_error)
 
     def collect(self):
@@ -173,12 +174,18 @@ class ResticCollector(object):
             # collect stats for each snap only if enabled
             if self.disable_stats or (self.slow_stats and self.slow_stats_counter != 0):
                 # return zero as "no-stats" value
-                stats = {
-                    "total_size": -1,
-                    "total_file_count": -1,
-                }
+                if self.slow_stats_cache is None:
+                    stats = {
+                        "total_size": -1,
+                        "total_file_count": -1,
+                    }
+                else:
+                    stats = self.slow_stats_cache
             else:
                 stats = self.get_stats(snap["id"])
+                self.slow_stats_cache = stats
+
+            print(stats)
 
             clients.append(
                 {
